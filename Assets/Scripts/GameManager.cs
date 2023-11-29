@@ -1,9 +1,5 @@
 using Cinemachine;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,9 +9,8 @@ public class GameManager : MonoBehaviour
 
     Player player;
 
-
     [HideInInspector] public Dialogue dialogue;
-    public CustomizeManager customize;
+    public Customize customize;
 
     void Awake()
     {
@@ -36,7 +31,6 @@ public class GameManager : MonoBehaviour
         dialogue.gameManager = this;
 
     }
-
     public void PlayerState(Player.State stat)
     {
         player.state = stat;

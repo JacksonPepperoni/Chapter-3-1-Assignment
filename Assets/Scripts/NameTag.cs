@@ -12,12 +12,10 @@ public class NameTag : MonoBehaviour
         GetComponent<Canvas>().worldCamera = Camera.main;
     }
 
-    public void Reload(string name) // 이름칸 사이즈변경
+    public void SizeChange(string name) // 이름칸 사이즈변경
     {
         txt.text = name;
         img.rectTransform.sizeDelta = new Vector2(txt.preferredWidth + 0.25f, txt.preferredHeight + 0.15f);
     }
-
-
 
 }

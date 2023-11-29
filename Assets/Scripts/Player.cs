@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using TMPro;
+
 public class Player : MonoBehaviour
 {
 
@@ -8,19 +8,18 @@ public class Player : MonoBehaviour
     {
         Play,
         Stop,
-        Talk,
+        Event,
     }
     [HideInInspector] public State state = State.Play;
 
 
-    private float speed = 8;
+    private float speed = 7;
 
+
+   [HideInInspector] public string name;
 
     [HideInInspector]
     public GameManager gameManager;
-
-    [HideInInspector]
-    public string name = "";
 
 
     private Camera _camera;
@@ -34,11 +33,10 @@ public class Player : MonoBehaviour
     private int hashIsDuck = Animator.StringToHash("isDuck");
 
 
-
     private Vector2 moveInput;
     private Vector2 mousePos;
 
-    private GameObject meetObj; // 접촉중인거
+    private Npc npc; // 접촉중인거
 
     [SerializeField] NameTag NameTagObj;
 
@@ -52,10 +50,15 @@ public class Player : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>();
     }
 
+    private void Start()
+    {
+        NameChange("산토끼토끼"); // 기본이름
+    }
+
 
     private void Update()
     {
-        if (anim.GetBool(hashIsDuck) || state == State.Stop || state == State.Talk) return;
+        if (anim.GetBool(hashIsDuck) || state != State.Play) return;
 
 
         rigid.MovePosition(rigid.position + moveInput); // 이동. 벨로시티 써야하는거아닌가 충돌처리하려면?
@@ -68,7 +71,7 @@ public class Player : MonoBehaviour
     {
         if (collision.CompareTag("NPC"))
         {
-            meetObj = collision.gameObject;
+            npc = collision.gameObject.GetComponent<Npc>();
             NameTagObj.gameObject.SetActive(false);
         }
 
@@ -76,17 +79,13 @@ public class Player : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        meetObj = null;
+        npc = null;
         NameTagObj.gameObject.SetActive(true);
     }
 
 
+    //■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
-    public void NameChange(string newName)
-    {
-        name = newName;
-        NameTagObj.Reload(newName);
-    }
 
 
 
@@ -98,7 +97,7 @@ public class Player : MonoBehaviour
     public void OnLook(InputValue value) // 마우스 포지션이 바뀔때만 이라서 마우스 멈추고 캐릭터가 마우스 옆으로 이동했을땐 좌우반전이 발동 안함.... 가만있을때만 마우스 위치봄
     {
 
-        if (anim.GetBool(hashIsDuck) || state == State.Stop || state == State.Talk) return;
+        if (anim.GetBool(hashIsDuck) || state != State.Play) return;
 
         mousePos = _camera.ScreenToWorldPoint(value.Get<Vector2>());
         spriteRenderer.flipX = (rigid.position.x > mousePos.x);
@@ -106,7 +105,7 @@ public class Player : MonoBehaviour
 
     public void OnDuck(InputValue value)
     {
-        if (state == State.Stop || state == State.Talk) return;
+        if (state != State.Play) return;
 
         anim.SetBool(hashIsDuck, value.isPressed);
 
@@ -115,20 +114,33 @@ public class Player : MonoBehaviour
     public void OnTalk(InputValue value)
     {
         if (state == State.Stop) return;
-        if (!value.isPressed || meetObj == null || anim.GetBool(hashIsDuck)) return;  // 눌렀을때 true 땔때 false 호출
+        if (!value.isPressed || npc == null || anim.GetBool(hashIsDuck)) return;  // 눌렀을때 true 땔때 false 호출
 
 
-        if (state == State.Talk)
+        if (state == State.Event)
         {
             gameManager.dialogue.Talk();
             return;
         }
 
-        state = State.Talk;
+        state = State.Event;
         anim.SetBool(hashIsWalk, false);
 
+        npc.Talk();
+        gameManager.dialogue.talkDic = npc.talkData;
         gameManager.dialogue.Open();
 
     }
+
+
+    //■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+
+    public void NameChange(string newName)
+    {
+        name = newName;
+        NameTagObj.SizeChange(newName);
+    }
+
 
 }

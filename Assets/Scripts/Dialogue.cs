@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.Playables;
 
 public class Dialogue : MonoBehaviour
 {
@@ -12,36 +11,29 @@ public class Dialogue : MonoBehaviour
 
     private Animator anim;
 
-    [SerializeField]
-    private TMP_Text lineText;
 
-    [SerializeField]
-    private Animator cursorAnim;
+    [SerializeField] private TMP_Text nameText; // 상대 이름
+    [SerializeField] private Image nameImg; // 상대이름칸
+
+
+    [SerializeField] private TMP_Text lineText;
+    [SerializeField] private Animator cursorAnim;
 
     private bool isTyping = false;
     private bool isclickDelay; //커서 눌리는 애니 동안 입력안받게
     private float clickDelay; // 커서 눌리는애니 길이 받는용
     private int line;
-    private WaitForSeconds typingTime = new WaitForSeconds(0.02f); // 타이핑 속도
+    private WaitForSeconds typingSpeed = new WaitForSeconds(0.02f); // 타이핑 속도
     [SerializeField] AnimationClip clickClip; // 커서 애니길이받는용
 
 
-    private Dictionary<int, DialogueSetting> talkDic; // 대화정보 받는 껍데기
+    [HideInInspector] public Dictionary<int, DialogueSetting> talkDic; // 대화정보 받는 껍데기
 
 
 
     void Awake()
     {
         anim = GetComponent<Animator>();
-
-        talkDic = new Dictionary<int, DialogueSetting>
-        {
-            { 0, new DialogueSetting("식충이", "안녕나는 식충이") },
-            { 1, new DialogueSetting("식충이", "방가방가") },
-            { 2, new DialogueSetting("식충이", "3333333333333333333333333333333333333333333") },
-            { 3, new DialogueSetting("식충이", "44444") }
-        };
-
         clickDelay = clickClip.length;
 
     }
@@ -68,7 +60,7 @@ public class Dialogue : MonoBehaviour
             return;
         }
 
-        isclickDelay = true; // 커서클릭 애니 진행중에 막을 방법이없어 bool 쓸수밖에...
+        isclickDelay = true; // 커서클릭 애니 진행중
         cursorAnim.SetTrigger("Click");
         Invoke("TalkEvent", clickDelay); // 커서 클릭애니 끝난후에 실행
 
@@ -86,10 +78,16 @@ public class Dialogue : MonoBehaviour
         }
 
         cursorAnim.gameObject.SetActive(false);
-
         lineText.text = talkDic[line].line;
-        StartCoroutine(TextVisible());
 
+        if (nameText.text != talkDic[line].name)
+        {
+            nameText.text = talkDic[line].name;
+            nameImg.rectTransform.sizeDelta = new Vector2(nameText.preferredWidth + 150f, nameImg.rectTransform.sizeDelta.y);
+        }
+
+
+        StartCoroutine(TextVisible());
     }
 
 
@@ -122,7 +120,7 @@ public class Dialogue : MonoBehaviour
             }
 
             counter += 1;
-            yield return typingTime;
+            yield return typingSpeed;
         }
     }
 
@@ -144,10 +142,13 @@ public class Dialogue : MonoBehaviour
         isTyping = false;
         lineText.text = "";
         line = 0;
+        nameText.text = talkDic[0].name;
+        typingSpeed = new WaitForSeconds(talkDic[0].speechSpeed);
 
         anim.SetBool("isOpen", true);
 
-        Talk();
+          Talk();
+
 
     }
 
@@ -158,7 +159,6 @@ public class Dialogue : MonoBehaviour
         isTyping = false;
 
         gameManager.PlayerState(Player.State.Play);
-
 
         anim.SetBool("isOpen", false);
 

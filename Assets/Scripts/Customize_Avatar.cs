@@ -5,20 +5,18 @@ public class Customize_Avatar : MonoBehaviour
     Animator anim;
 
     [HideInInspector]
-   public CustomizeManager customizeManager;
+    public Customize customizeManager;
 
     void Awake()
     {
         anim = GetComponent<Animator>();
     }
-
-
+    
     public void AvatarChoose(int i) // 아바타 고르는 버튼에 연결
     {
         customizeManager.AvatarChange(i);
         Close();
     }
-
 
 
     //■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
