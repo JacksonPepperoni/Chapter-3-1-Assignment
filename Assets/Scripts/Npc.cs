@@ -16,7 +16,7 @@ public class Npc : MonoBehaviour
     Dictionary<Name, string> npcNames = new Dictionary<Name, string>
     {
     { Name.plant, "충식이" },
-    { Name.slug, "달팽구" },
+    { Name.slug, "에스카르고" },
      };
 
 

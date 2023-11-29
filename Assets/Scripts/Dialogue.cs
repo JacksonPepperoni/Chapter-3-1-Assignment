@@ -83,7 +83,7 @@ public class Dialogue : MonoBehaviour
         if (nameText.text != talkDic[line].name)
         {
             nameText.text = talkDic[line].name;
-            nameImg.rectTransform.sizeDelta = new Vector2(nameText.preferredWidth + 150f, nameImg.rectTransform.sizeDelta.y);
+            nameImg.rectTransform.sizeDelta = new Vector2(nameText.preferredWidth + 120f, nameImg.rectTransform.sizeDelta.y);
         }
 
 
@@ -142,7 +142,10 @@ public class Dialogue : MonoBehaviour
         isTyping = false;
         lineText.text = "";
         line = 0;
+
         nameText.text = talkDic[0].name;
+        nameImg.rectTransform.sizeDelta = new Vector2(nameText.preferredWidth + 150f, nameImg.rectTransform.sizeDelta.y);
+
         typingSpeed = new WaitForSeconds(talkDic[0].speechSpeed);
 
         anim.SetBool("isOpen", true);
